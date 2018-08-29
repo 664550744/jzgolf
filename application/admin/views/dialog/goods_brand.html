@@ -1,0 +1,114 @@
+
+  
+  <body >
+  <div id='page'>
+   <form method="post" class="layui-form" >
+    <div class="x-body">
+      <form  method="post" class="layui-form">
+	  <input type="hidden" name="id" value="<?php echo $id; ?>" />
+	  <fieldset class="layui-elem-field x-body">
+            <legend>商品品牌</legend>
+			
+		
+		<div class="layui-form-item">
+		  <label for="text" class="layui-form-label">
+			  <span class="x-red">*</span>品牌名称
+		  </label>
+		  <div class="layui-input-inline">
+			  <input type="text" id="text" name="text" required="" lay-verify="required"
+			  autocomplete="off" class="layui-input" value="<?php echo $text; ?>">
+		  </div>
+		</div>
+		<div class="layui-form-item">
+		  <label for="order_value" class="layui-form-label">
+			  <span class="x-red">*</span>排序
+		  </label>
+		  <div class="layui-input-inline">
+			  <input type="number"  id="order_value" name="order_value" required="" lay-verify="required"
+			  autocomplete="off" class="layui-input" value="<?php echo $order_value; ?>">
+		  </div>
+		</div>
+		</fieldset>
+		
+		<div class="layui-form-item">
+		  <label for="L_repass" class="layui-form-label">
+		  </label>
+		  
+		  <button   class="layui-btn" lay-filter="add" lay-submit="submit">
+			 立即提交
+		  </button>
+		</div>
+	  </form>
+         
+    </div>
+	</form>
+	</div>
+ 
+  </body>
+
+</html>
+
+<script type="text/javascript"> 
+var vm = new Vue({
+							el: '#page',
+							data: {
+								
+							}
+						}) ;
+	
+	$(function() {
+		layui.use(['form','layer'], function(){
+				$ = layui.jquery;
+			  var form = layui.form
+			  ,layer = layui.layer;
+			
+			  
+				form.on('select(type)', function(data){
+							  console.log(data.value);
+							  vm.type=data.value;
+							});
+			  //监听提交
+			  form.on('submit(add)', function(data){
+				console.log(data.field);
+				//发异步，把数据提交给php
+				
+				$.ajax({
+					url:"<?php echo site_url('Ajax/goods_brand');?>",
+					type:"post",
+					data:data.field,
+						success:function(str){
+							console.log(str);
+							 var obj = eval('(' + str + ')');
+							
+							if(obj.code==1){
+								
+								layer.msg(obj.msg,{icon:1,time:1000},function(){
+									parent.reload()
+									// var index = parent.layer.getFrameIndex(window.name);
+									//关闭当前frame
+									//parent.layer.close(index);
+								});
+							}else{
+								layer.msg(obj.msg);
+							}
+							
+						},
+						error:function(e){
+							
+							layer.msg('未知错误！！');
+						}
+					}); 
+					
+					
+				return false;
+			  });
+			  
+			  
+			  
+			});
+
+	
+	})
+		
+		
+</script>

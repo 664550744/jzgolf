@@ -1,0 +1,199 @@
+
+  
+  <body >
+  <div id='page'>
+   <form method="post" class="layui-form" >
+    <div class="x-body">
+      <form  method="post" class="layui-form">
+	  <input type="hidden" name="id" value="<?php echo $id; ?>" />
+	  <fieldset class="layui-elem-field x-body">
+            <legend>商品选项</legend>
+		<div class="layui-form-item">
+		  <label for="type" class="layui-form-label">
+			  <span class="x-red">*</span>类型
+		  </label>
+		  <div class="layui-input-inline">
+			  <select v-model="type" id="type" name="type" lay-filter="type">
+			  <option value=""></option>
+			  <optgroup label="选择">
+				<option value="0">下拉选择框</option>
+				<option value="1">单选</option>
+				<option value="2">多选</option>
+			  </optgroup>
+			  <optgroup label="文本">
+				<option value="3">输入框</option>
+				<option value="4">多行输入</option>
+			  </optgroup>
+			  <optgroup label="日期">
+				<option value="5">日期</option>
+				<option value="6">时间</option>
+				<option value="7">日期&时间</option>
+			  </optgroup>
+			  <optgroup label="文件">
+				<option value="8">文件</option>
+			  </optgroup>
+				
+			  </select>
+		  </div>
+		</div>
+		<div class="layui-form-item">
+		  <label for="text" class="layui-form-label">
+			  <span class="x-red">*</span>选项名称
+		  </label>
+		  <div class="layui-input-inline">
+			  <input type="text" id="text" name="text" required="" lay-verify="required"
+			  autocomplete="off" class="layui-input" value="<?php echo $text; ?>">
+		  </div>
+		</div>
+		<div class="layui-form-item">
+		  <label for="order_value" class="layui-form-label">
+			  <span class="x-red">*</span>排序
+		  </label>
+		  <div class="layui-input-inline">
+			  <input type="number"  id="order_value" name="order_value" required="" lay-verify="required"
+			  autocomplete="off" class="layui-input" value="<?php echo $order_value; ?>">
+		  </div>
+		</div>
+		</fieldset>
+		<fieldset v-if="type<3&&type!=''" class="layui-elem-field x-body">
+            <legend>商品选项值</legend><table class="layui-table">
+        <thead>
+          <tr>
+            
+            <th>选项值</th>
+            <th width="120" >图片</th>
+            <th>排序</th>
+            <th  width="50">操作</th>
+        </thead>
+        <tbody>
+          <tr v-for='(item,index)   in optionList'>
+            
+            <td><input v-bind:data-index="index" type="text"    name="options[]" onchange="optionsChange(this)" required="" lay-verify="required"
+			  autocomplete="off" class="layui-input" placeholder="选项值" v-bind:value="item.option"></td>
+            <td>
+			<input type="hidden" name="options_img[]" value="" />
+			</td>
+            <td><input v-bind:data-index="index" type="number" id="username" name="options_order[]" required="" lay-verify="required"
+			  autocomplete="off"  placeholder="排序" class="layui-input" v-bind:value="item.options_order"></td>
+            <td class="td-manage">
+              
+              <button  type="button" class="layui-btn layui-btn-danger" v-bind:data-index="index" onclick="del_options(this)"><i class="layui-icon"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <xblock style="padding-right:30rpx">
+				
+				
+				<button type="button" class="layui-btn x-right"  onclick="add_options()"><i class="layui-icon"></i></button>
+				<div class="layui-clear"></div>
+				
+			  </xblock>
+
+    </div>
+    
+			
+		</fieldset>
+		<div class="layui-form-item">
+		  <label for="L_repass" class="layui-form-label">
+		  </label>
+		  
+		  <button   class="layui-btn" lay-filter="add" lay-submit="submit">
+			 立即提交
+		  </button>
+		</div>
+	  </form>
+         
+    </div>
+	</form>
+	</div>
+ 
+  </body>
+
+</html>
+
+<script type="text/javascript"> 
+	var vm = new Vue({
+							el: '#page',
+							data: {
+								type: <?php echo $type ;?>,
+								optionList:<?php echo $options ;?>
+							}
+						}) ;
+	$(function() {
+		layui.use(['form','layer'], function(){
+				$ = layui.jquery;
+			  var form = layui.form
+			  ,layer = layui.layer;
+			
+			  
+				form.on('select(type)', function(data){
+							  console.log(data.value);
+							  vm.type=data.value;
+							});
+			  //监听提交
+			  form.on('submit(add)', function(data){
+				console.log(data.field);
+				//发异步，把数据提交给php
+				if(data.field.type.length==0){
+					layer.msg("请选择类型");
+					return false;
+				}
+				$.ajax({
+					url:"<?php echo site_url('Ajax/goods_select');?>",
+					type:"post",
+					data:data.field,
+						success:function(str){
+							console.log(str);
+							 var obj = eval('(' + str + ')');
+							
+							if(obj.code==1){
+								
+								layer.msg(obj.msg,{icon:1,time:1000},function(){
+									parent.reload()
+									// var index = parent.layer.getFrameIndex(window.name);
+									//关闭当前frame
+									//parent.layer.close(index);
+								});
+							}else{
+								layer.msg(obj.msg);
+							}
+							
+						},
+						error:function(e){
+							
+							layer.msg('未知错误！！');
+						}
+					}); 
+					
+				return false;
+			  });
+			  
+			  
+			  
+			});
+
+	
+	})
+		
+		function add_options(){
+		var j = {option:'',img:'',options_order:0};
+			vm.optionList.push(j);
+		}
+		function del_options(thisDom){
+			//vm.optionList.pop($(thisDom).data("index")); 
+			var i = $(thisDom).data("index");
+			var arr =[];
+			for(j=0;j<vm.optionList.length;j++){
+				if(j!=i){
+				arr.push(vm.optionList[j]);
+				}
+			}
+			vm.optionList = arr;
+		}
+		function optionsChange(thisDom){
+		vm.optionList[$(thisDom).data("index")]["option"]=$(thisDom).val();
+		console.log($(thisDom).val());
+			
+		}
+</script>

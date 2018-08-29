@@ -1,0 +1,739 @@
+
+    <link rel="stylesheet" href="<?php echo base_url();?>assets/kindeditor/themes/default/default.css" />
+	<link rel="stylesheet" href="<?php echo base_url();?>assets/kindeditor/plugins/code/prettify.css" />
+	<script charset="utf-8" src="<?php echo base_url();?>assets/kindeditor/kindeditor-all-min.js"></script>
+	<script charset="utf-8" src="<?php echo base_url();?>assets/kindeditor/lang/zh-CN.js"></script>
+	<script charset="utf-8" src="<?php echo base_url();?>assets/kindeditor/plugins/code/prettify.js"></script>
+	<script>
+		var editor;
+		KindEditor.ready(function(K) {
+			 editor = K.create('textarea[name="content"]', {
+				cssPath : '<?php echo base_url();?>assets/kindeditor/plugins/code/prettify.css',
+				uploadJson : '<?php echo site_url("Keditor/upload_json");?>',
+				fileManagerJson : '<?php echo site_url("Keditor/file_manager_json");?>',
+				height:'400px',
+				allowFileManager : true,
+				afterCreate : function() {
+					var self = this;
+					K.ctrl(document, 13, function() {
+						self.sync();
+						K('form[name=example]')[0].submit();
+					});
+					K.ctrl(self.edit.doc, 13, function() {
+						self.sync();
+						K('form[name=example]')[0].submit();
+					});
+					 
+				}
+			});
+			prettyPrint();
+			kk=K;
+		});
+	</script>
+	<style> 
+	.layui-upload-img{width: 92px; height: 92px; float: left;margin-right: 20px;}
+	.imgs{width: 92px;height:92px;}
+	.required{
+		color: #ff8400;
+	}
+</style>
+  <body >
+  	<div id='page'>
+  		<form class="layui-form" action="" name="example">
+  			<input type="hidden" name="id" v-bind:value="id" v-model="id">
+  		<div class="layui-tab">
+		  <ul class="layui-tab-title" >
+		    <li class="layui-this" >基本信息</li>
+		    <li>介绍内容</li>
+		    <li>图片</li>
+		    <li>属性</li>
+		    <li>选项</li>
+		    <li>库存</li>
+		  </ul>
+		  <div class="layui-tab-content"  style="min-height: 400px;">
+		    <div class="layui-tab-item layui-show">
+
+		      <div class="layui-form-item">
+			    <label class="layui-form-label"><span class="required">*</span>名称</label>
+			    <div class="layui-input-block">
+			      <input type="text"  v-model="name" placeholder="请输入名称" autocomplete="off" class="layui-input">
+			    </div>
+			  </div>
+
+			  <div class="layui-form-item">
+			    <label class="layui-form-label"><span class="required">*</span>分类</label>
+			    <div class="layui-input-inline">
+			      <select name="category_id" lay-filter="category_id" v-model="category_id" >
+			        <option value="0"></option>
+			        <option v-for=' (item,index)  in goodsInfo.category.data' v-bind:value="item.id">{{item.text}}</option>
+			        
+			      </select>
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label"><span class="required">*</span>品牌</label>
+			    <div class="layui-input-inline">
+			      <select name="brand_id" lay-filter="brand_id"  v-model="brand_id" >
+			        <option value=""></option>
+			        <option v-for=' (item,index)  in goodsInfo.goods_brand.data' v-bind:value="item.id">{{item.text}}</option>
+			      </select>
+			    </div>
+			  </div>
+
+
+			  
+			  <div class="layui-form-item">
+			    <label class="layui-form-label"><span class="required">*</span>市场价</label>
+			    <div class="layui-input-inline">
+			      <input type="text" v-model="price_market" name="price_market"  placeholder="0.00"  autocomplete="off" class="layui-input">
+			    </div>
+			  </div>
+			  
+			  <div class="layui-form-item">
+			    <label class="layui-form-label"><span class="required">*</span>价格</label>
+			    <div class="layui-input-inline">
+			      <input type="text" name="price" v-model="price"  placeholder="0.00" autocomplete="off" class="layui-input">
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label"><span class="required">*</span>货号</label>
+			    <div class="layui-input-inline">
+			      <input type="text" name="num_code" v-model="num_code"  placeholder="请输入商品货号" autocomplete="off" class="layui-input">
+			    </div>
+			  </div>
+
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">新旧</label>
+			    <div class="layui-input-block">
+			      <input type="radio" lay-filter="is_new" name="is_new" v-model="is_new" value="0" title="全新" checked>
+			      <input type="radio" lay-filter="is_new" name="is_new" v-model="is_new" value="1" title="二手" >
+			    </div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">是否上架</label>
+			    <div class="layui-input-block">
+			      <input type="radio" name="online" lay-filter="online" v-model="online" value="0" title="上架" checked>
+			      <input type="radio" name="online" lay-filter="online" v-model="online" value="1" title="下架" >
+			    </div>
+			  </div>
+
+				
+
+		    </div>
+		    <div class="layui-tab-item">
+				<textarea id="content" name="content" v-model="content" v-bind:vule="content" style="width:700px;height:200px;visibility:hidden;">{{content}}</textarea>
+		    </div>
+		    <div class="layui-tab-item">
+
+				<button type="button" class="layui-btn" id="upload_img">
+				  <i class="layui-icon">&#xe67c;</i>上传图片
+				</button>
+				<div class="layui-upload-list" id="demo2">
+					<div v-for=' (item,index)  in imgs' class="layui-upload-img">
+						<img  v-bind:src="item" alt="" class="imgs" >
+						<div style="width:30px;margin: auto;"><i v-bind:data-i='index' onclick="del_img(this)" class="layui-icon layui-icon-close-fill" style="font-size: 30px; color: #ff8400;"></i></div>
+						
+					</div>
+					<div style="clear: both;"></div>
+					
+				</div>
+		    </div>
+		    
+		    <div class="layui-tab-item">
+		    	<div id="goods_attribute">
+		    		<table class="layui-table" >
+					  <colgroup>
+					    <col width="150">
+					    <col width="200">
+					    <col>
+					  </colgroup>
+					  <thead>
+					    <tr>
+					      <th>属性名称</th>
+					      <th>属性值</th>
+					    </tr> 
+					  </thead>
+					  <tbody>
+					    <tr v-for=' (item,index)  in goods_attribute'>
+					      <td>
+					      	<input type="text"  v-model="goods_attribute[index]['k']"  v-bind:value="item.k"  autocomplete="off" placeholder="请输入属性名称" class="layui-input">
+
+					      </td>
+					      <td>
+					      	<input type="text"   v-model="goods_attribute[index]['v']" v-bind:value="item.v" autocomplete="off" placeholder="请输入属性值" class="layui-input">
+
+					      </td>
+					     
+					    </tr>
+					    
+					  </tbody>
+					</table>
+		    	</div>
+				<button class="layui-btn" type="button" v-on:click="addAttribute()">
+				  <i class="layui-icon">&#xe608;</i> 添加属性
+				</button>
+		    </div>
+		    <div class="layui-tab-item">
+		    	
+		    	<div id="goods_select">
+		    		<table class="layui-table">
+					  <colgroup>
+					    <col >
+					    <col>
+					    <col>
+					    <col>
+					    <col width="50">
+					  </colgroup>
+					  <thead>
+					    <tr>
+					      <th>选项名称</th>
+					      <th>选项值</th>
+					      <th>加减价（减价在前面添加“-”号）</th>
+					      <th></th>
+					    </tr> 
+					  </thead>
+					  <tbody>
+					  	<template v-for=' (item,index)  in goods_select'>
+					  		<template v-for=' (it,i)  in item.list'>
+					  			<tr v-if ="i==0">
+							      <td v-bind:rowspan="item.list.length+1">
+								      	<div class="layui-input-inline">
+									      {{item.v}}
+									    </div>
+									</td>
+							      <td>
+							      	<div class="layui-input-inline">
+								      <input type="text"  v-model="goods_select[index]['list'][i][0]"   v-bind:value="it[0]" placeholder="请输入选项值" class="layui-input">
+								    </div>
+
+							      </td>
+							      
+							      <td>
+
+							      	<div class="layui-input-inline">
+								      <input type="text" v-model="goods_select[index]['list'][i][1]" v-bind:value="it[1]"  autocomplete="off" placeholder="请输入加减价" class="layui-input">
+								    </div>
+
+							      </td>
+							      <td>
+
+							      	<div class="layui-input-inline">
+								      <button type="button" onclick="delSelectSub(this)" v-bind:data-index='index' v-bind:data-i='i'  class="layui-btn layui-btn-danger"><i class="layui-icon"></i></button>
+								    </div>
+
+							      </td>
+							    </tr>
+							    <tr v-else>
+							      <td>
+							      <div class="layui-input-inline">
+								      <input type="text" name="title" v-model="goods_select[index]['list'][i][0]" autocomplete="off" v-bind:value="it[0]" placeholder="请输入选项值" class="layui-input">
+								    </div>
+
+							      </td>
+							      
+							      <td>
+
+							      	<div class="layui-input-inline">
+								      <input type="text" v-model="goods_select[index]['list'][i][1]" v-bind:value="it[1]"  autocomplete="off" placeholder="请输入加减价" class="layui-input">
+								    </div>
+
+							      </td>
+							      <td>
+
+							      	<div class="layui-input-inline">
+								      <button type="button" onclick="delSelectSub(this)" v-bind:data-index='index' v-bind:data-i='i' class="layui-btn layui-btn-danger"><i class="layui-icon"></i></button>
+								    </div>
+
+							      </td>
+							    </tr>
+					  		</template>
+
+					    
+					    <tr >
+					    	<td colspan="2"></td>
+							<td >
+								<div class="layui-input-inline">
+									<button type="button" onclick="addSelectSub(this)" v-bind:data-index='index' class="layui-btn "><i class="layui-icon"></i></button>
+							    </div>
+						      	
+							</td>
+
+					    </tr>
+					    </template>
+					    
+					  </tbody>
+					</table>
+		    	</div>
+		    	<button v-if="goods_select.length<3" class="layui-btn" type="button" onclick="addSelect()">
+				  <i class="layui-icon">&#xe608;</i> 添加选项
+				</button>
+		    </div>
+		    <div class="layui-tab-item"> 
+		    	<table class="layui-table" >
+					  <colgroup>
+					    <col width="30">
+					    <col width="150">
+					    <col width="50">
+					    <col>
+					  </colgroup>
+					  <thead>
+					    <tr>
+					    	<th></th>
+					      <th>商品</th>
+					      <th>库存数量</th>
+					    </tr> 
+					  </thead>
+					  <tbody>
+					  	<template v-if='stock_num_info.length==0'>
+					  		<tr >
+					    	<td>1</td>
+					      <td>
+					      	
+					      	{{name}}
+
+					      </td>
+					      <td>
+					      	<input type="text" v-model="stock_num" v-bind:vule="stock_num"  autocomplete="off" placeholder="请输入库存" class="layui-input">
+
+					      </td>
+					     
+					    </tr>
+					  	</template>
+					    <tr v-for=' (item,index)  in stock_num_info'>
+					    	<td>{{index+1}}</td>
+					      <td>
+
+					      	
+					      	<template v-for=' (it,i)  in item.k'>
+
+							<span v-if="i>0"> -- > </span>{{goods_select[i]['list'][it][0]}}
+					      	</template>
+
+					      </td>
+					      <td>
+					      	<input type="text" name="title" v-model="stock_num_info[index]['v']" v-bind:value="item.v" autocomplete="off" placeholder="请输入库存" class="layui-input">
+
+					      </td>
+					     
+					    </tr>
+					    
+					  </tbody>
+					</table>
+
+			<button class="layui-btn" lay-filter="add" lay-submit="submit" type="button"  style="margin:20px auto;display: block;">立即提交</button>
+		    </div>
+		  </div>
+		</div>
+		      
+   		</form>
+	</div>
+    
+    <script>
+	var form;
+	layui.use(['upload','form'], function(){
+		  var upload = layui.upload;
+		   form = layui.form;
+		   //多图片上传
+		  upload.render({
+		    elem: '#upload_img'
+		    ,url: '<?php echo site_url('Welcome/upload');?>'
+		    ,data: {path: ''} 
+		    ,multiple: true
+		    ,before: function(obj){
+		      //预读本地文件示例，不支持ie8
+		      layer.load();
+		      obj.preview(function(index, file, result){
+		      	/*
+		      	var img = vm.imgs;
+		      	img[img.length]=result;
+		      	vm.imgs = img;
+		        $('#demo2').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img">')
+		        */
+		      });
+		    }
+		    ,done: function(res){
+		    	 layer.closeAll('loading'); //关闭loading
+		      console.log(res);
+		      if(res.code == 0){ //上传成功
+		       //上传完毕
+		      	//var img = vm.imgs;
+		      	//img[img.length]=res.data.src;
+		      	vm.imgs.push(res.data.src);
+		        //$('#demo2').append('<img src="'+ res.data.src +'"  class="layui-upload-img">')
+		      }
+		      this.error(index, upload);
+
+		      
+		    }
+		  });
+
+		form.on('select(category_id)', function(data){
+			vm.category_id =data.value;
+		});
+		form.on('select(brand_id)', function(data){
+			vm.brand_id =data.value;
+		});
+		form.on('radio(is_new)', function(data){
+			vm.is_new =data.value;
+		});
+		form.on('radio(online)', function(data){
+			vm.online =data.value;
+		}); 
+		//监听提交
+          form.on('submit(add)', function(data){
+            console.log(data.field);
+            
+           var html_k=encodeURIComponent(editor.html());
+			//editor.html('HTML code');
+			
+			if(vm.name.length<4){
+				layer.msg('商品名称至少4个字');
+				return false;
+			}
+			if(vm.category_id<1){
+				layer.msg('请选择分类');
+				return false;
+			}
+			if(vm.brand_id<1){
+				layer.msg('请选择品牌');
+				return false;
+			}
+			if(vm.price_market<1){
+				layer.msg('请输入市场价');
+				return false;
+			}
+			if(vm.price<1){
+				layer.msg('请输入价格');
+				return false;
+			}
+			if(vm.num_code<1){
+				layer.msg('请输入商品货号');
+				return false;
+			}
+			if(vm.num_code<1){
+				layer.msg('请输入商品货号');
+				return false;
+			}
+			if(html_k.length<10){
+				layer.msg('商品内容必须大于10个字符');
+				return false;
+			}
+			if(vm.imgs.length<1){
+				layer.msg('请上传商品图片');
+				return false;
+			}
+			
+			$.ajax({
+                url:"<?php echo site_url('Ajax/goods');?>",
+                type:"post",
+                data:{id:vm.id,category_id:vm.category_id,brand_id:vm.brand_id,name:vm.name,price_market:vm.price_market,price:vm.price,num_code:vm.num_code,is_new:vm.is_new,online:vm.online,content:html_k,stock_num:vm.stock_num,imgs:JSON.stringify(vm.imgs),stock_num_info:JSON.stringify(vm.stock_num_info),goods_attribute:JSON.stringify(vm.goods_attribute),goods_select:JSON.stringify(vm.goods_select)},
+					success:function(str){
+						console.log(str);
+						 var obj = eval('(' + str + ')');
+						console.log(obj.msg);
+						console.log("success..");
+						console.log("over..");
+						if(obj.code==1){
+							layer.msg(obj.msg,function(){
+								parent.reload();
+							});
+						}else{
+							layer.msg(obj.msg);
+						}
+						
+					},
+					error:function(e){
+						
+						layer.msg('登录出错误！！');
+					}
+				}); 
+			
+			/*
+	alert(vm.name)
+	alert(vm.category_id)
+	alert(vm.brand_id)
+	alert(vm.price_market)
+	alert(vm.price)
+	alert(vm.num_code)
+	alert(vm.is_new)
+	alert(vm.online)
+	alert(vm.content)
+	alert(vm.stock_num)
+	
+	alert(JSON.stringify(vm.imgs))
+	alert(JSON.stringify(vm.goods_attribute))
+	alert(JSON.stringify(vm.goods_select))
+	alert(JSON.stringify(vm.stock_num_info))
+	*/
+            return false;
+          }); 
+    
+	});
+		function addSelect()
+		{
+			layer.prompt({
+			  formType: 0,
+			  value: '',
+			  title: '请输入选项名称',
+			}, function(value, index, elem){
+
+			  
+			  var JsonStr = "{'v':‘"+value+"’,'list':[{'',0,0}]}"
+			  var goods_selectV={};
+			  goods_selectV.v =value;
+			  var listJson=[];
+			  listJson.push('');
+			  listJson.push(0);
+			  var listJsons=[];
+			  listJsons.push(listJson)
+			  goods_selectV.list=listJsons;
+			  vm.goods_select.push(goods_selectV);
+			  vm.stock_num_info = initNumList();
+			 layer.close(index);
+			});
+			
+		}
+		function addSelectSub(d){
+			var index = d.getAttribute("data-index");
+			var listJson=[];
+			listJson.push('');
+			listJson.push(0);
+			var goods_select =vm.goods_select[index];
+			goods_select.list.push(listJson);
+			
+			vm.goods_select[index]=goods_select;
+			vm.stock_num_info = initNumList();
+				
+		}
+		function delSelectSub(d){
+			var index = d.getAttribute("data-index");
+			var i = d.getAttribute("data-i");
+			var goods_select = vm.goods_select;
+			if(goods_select.length==1){
+				vm.goods_select =[];
+				vm.stock_num_info = [];
+			}else{
+				var list = goods_select[index]["list"];
+				if(i==0&&list.length==1){
+
+					var goods_select_new =[];
+					for(j=0;j<goods_select.length;j++){
+						if(j!=i){
+							goods_select_new.push(goods_select[j])
+						}
+
+					}
+
+					goods_select = goods_select_new;
+				}else{
+					var listNew =[];
+					for(j=0;j<list.length;j++){
+						if(i!=j){
+							listNew.push(list[j])
+						}
+						
+					}
+					goods_select[index]["list"] =listNew;
+
+				}
+				vm.goods_select =goods_select;
+			vm.stock_num_info = initNumList();
+
+			}
+			
+			
+			
+		}
+		
+
+		function del_img(d){
+			
+			var i = d.getAttribute("data-i");
+			var imgs = vm.imgs;
+			var imgs_new =[];
+				for(j=0;j<imgs.length;j++){
+					if(j!=i){
+						imgs_new.push(imgs[j])
+					}
+
+				}
+				imgs=imgs_new;
+			vm.imgs =imgs_new;
+		}
+		
+		function initNumList(){
+			var goods_select =vm.goods_select
+			var arr = [];
+			for (var i = 0; i <goods_select.length; i++) {
+				var arrs = [];
+				for (var j = 0; j <goods_select[i]["list"].length; j++) {
+					arrs.push(j);
+				}
+				arr.push(arrs);
+			}
+			var jsonObj={};
+			var JsonArrs = doCombination(arr);
+			//return doCombination(arr);
+			var JsonArr=[]; 
+
+			for(i=0;i<JsonArrs.length;i++){
+				jsonObj={};
+				jsonObj.k=JsonArrs[i];
+				jsonObj.v=0;
+				JsonArr.push(jsonObj);
+			}
+			return JsonArr;
+		}
+
+	var vm = new Vue({
+							el: '#page',
+							data: {
+								goodsInfo: {
+									'category':{
+										'data':[]
+									},'goods_brand':{
+										'data':[]
+									}
+								},
+								id:<?php echo intval($id); ?>,
+								//id:0,
+								name:'',
+								category_id:0,
+								brand_id:0,
+								price_market:0.00,
+								price:0.00,
+								num_code:'',
+								is_new:0,
+								online:0,
+								content:'',
+								imgs:[],
+								goods_select:[],
+								goods_attribute:[],
+								stock_num:0,
+								stock_num_info:[]
+							},
+							
+
+					        mounted: function () {
+					                this.getCategoryList();
+					        },
+					        methods: {
+					        	getCategoryList:function(e){
+
+					        		var vm = this;
+			                        vm.$http.get("<?php echo site_url('Json/getGoods?id=').$id;?>").then(function(response) {
+			                        	 var obj = response.body;
+			                  				
+											if(obj.code==1){
+												vm.num=obj.num;
+												vm.goodsInfo=obj.data;
+												//alert(JSON.stringify(obj.data))
+												if(!$.isEmptyObject(obj.goods)){
+
+													vm.name=obj.goods.name;
+													vm.category_id=obj.goods.category_id;
+													vm.brand_id=obj.goods.brand_id;
+													vm.price_market=obj.goods.price_market;
+													vm.price=obj.goods.price;
+													vm.num_code=obj.goods.num_code;
+													vm.is_new=obj.goods.is_new;
+													vm.online=obj.goods.online;
+													vm.imgs=obj.goods.imgs;
+													vm.goods_select=obj.goods.goods_select;
+													vm.goods_attribute=obj.goods.goods_attribute;
+													vm.stock_num=obj.goods.stock_num;
+													vm.stock_num_info=obj.goods.stock_num_info;
+													vm.content = obj.goods.goods_content;
+													editor.html(vm.content);
+												}
+													
+												
+												
+
+											}
+			                                
+			                                vm.$nextTick(function () {
+			                                	
+			                                	layui.use('form', function(){
+												  var form = layui.form;
+
+												  
+												  //各种基于事件的操作，下面会有进一步介绍
+												  form.on('switch(state)', function(obj){
+												  	console.log(obj.elem); //得到checkbox原始DOM对象
+													  console.log(obj.elem.checked); //开关是否开启，true或者false
+													  console.log(obj.value); //开关value值，也可以通过data.elem.value得到
+													  console.log(obj.othis); //得到美化后的DOM对象
+													  
+													  if(obj.elem.checked){
+													  	vm.changeCategoryList(obj.value,0);
+													  }else{vm.changeCategoryList(obj.value,1);}
+												  })
+												  form.render('select'); //刷新select选择框渲染
+												         
+												});
+												
+
+			                                })
+			                                
+			                                
+			                                
+			                        },
+			                        function(response) {
+			                                alert('获取商家列表失败！');
+			                        });
+
+					        	},
+					        	changeCategoryList:function(id,state){
+					        		 this.$http.post("<?php echo site_url('Ajax/categoryState');?>",{id:id,state:state},{emulateJSON:true}).then( (response) => {
+
+				                 } )
+					        	},
+					        	addAttribute:function(e){
+					        		
+					        		var AttributeV={};
+					        		AttributeV['k']='';
+					        		AttributeV['v']='';
+					        		
+					        		vm.goods_attribute.push(AttributeV);
+					        		
+					        	}
+					        }
+						}) ;
+
+/*****组合排列****/
+
+function doCombination(arr) {
+    var count = arr.length - 1; //数组长度(从0开始)
+    var tmp = [];
+    var totalArr = [];// 总数组
+
+    return doCombinationCallback(arr, 0);//从第一个开始
+    //js 没有静态数据，为了避免和外部数据混淆，需要使用闭包的形式
+    function doCombinationCallback(arr, curr_index) {
+        for(val of arr[curr_index]) {
+            tmp[curr_index] = val;//以curr_index为索引，加入数组
+            //当前循环下标小于数组总长度，则需要继续调用方法
+            if(curr_index < count) {
+                doCombinationCallback(arr, curr_index + 1);//继续调用
+            }else{
+                totalArr.push(tmp);//(直接给push进去，push进去的不是值，而是值的地址)
+            }
+
+            //js  对象都是 地址引用(引用关系)，每次都需要重新初始化，否则 totalArr的数据都会是最后一次的 tmp 数据；
+            oldTmp = tmp;
+            tmp = [];
+            for(index of oldTmp) {
+                tmp.push(index);
+            }
+            }
+            return totalArr;
+    }
+}
+
+	
+		
+	</script>
+  </body>
+
+</html>

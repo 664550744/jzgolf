@@ -1,0 +1,269 @@
+
+  
+  <body >
+  <div id='page'>
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">商品目录</a>
+        <a>
+          <cite>商品分类</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+      
+          <button class="layui-btn" onclick="x_admin_show('添加','<?php echo site_url('Dialog/category');?>',500,400)"><i class="layui-icon"></i>增加</button>
+        
+      <form class="layui-form">
+      
+      <table lay-filter="demo11" id="test11"  class="layui-table layui-form">
+        <thead>
+          <tr>
+            
+            <th width="70">ID</th>
+            <th>栏目名</th>
+            <th width="50">排序</th>
+            <th width="80">状态</th>
+            <th width="120">操作</th>
+        </thead>
+        <tbody  class="x-cate">
+          
+			<tr v-for=' (item,index)  in dataList'  v-bind:cate-id="item.id" v-bind:fid="item.pid" >
+           
+            <td>{{item.id}}</td>
+            <td>
+			<span v-if="item.type==1">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			<span v-if="item.type==2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              
+              <i v-if="item.children>0" class="layui-icon x-show" status='true'>&#xe623;</i>
+              <span  v-else-if ="item.children==0">├</span>{{item.text}}
+            </td>
+            <td>{{item.order}}</td>
+            <td>
+              <input v-if="item.state==1" type="checkbox" v-bind:value="item.id" lay-filter="state" name="switch"  lay-text="开启|停用"   lay-skin="switch">
+              <input v-if="item.state==0" type="checkbox" v-bind:value="item.id" lay-filter="state" name="switch"  lay-text="开启|停用"   lay-skin="switch" checked >
+            </td>
+            <td class="td-manage">
+              <button type="button" class="layui-btn layui-btn layui-btn-xs"  v-bind:data-id="item.id" v-bind:data-pid="item.pid" v-bind:data-order="item.order" v-bind:data-text="item.text"  onclick="editCategoty(this)" ><i class="layui-icon">&#xe642;</i>编辑</button>
+              
+              <button type="button" class="layui-btn-danger layui-btn layui-btn-xs" v-bind:data-id="item.id"  onclick="member_del(this)" href="javascript:;" ><i class="layui-icon">&#xe640;</i>删除</button>
+            </td>
+          </tr>
+		  
+		  
+		  
+		  
+	   </tbody>
+      </table>
+      </form>
+    </div>
+	
+	</div>
+    
+    <script>
+		var form;
+		
+	  
+
+	  
+      
+
+      /*用户-删除*/
+      function member_del(dom){
+	  
+          layer.confirm('确认要删除吗？',function(index){
+              //发异步删除数据
+              
+			  $.ajax({
+                url:"<?php echo site_url('Ajax/categoryDel');?>",
+                data:{id:dom.getAttribute("data-id")},
+                type:"post",
+				success:function(str){
+					console.log(str);
+					console.log(vm);
+					 var obj = eval('(' + str + ')');
+					 
+					if(obj.code==1){
+						layer.msg(obj.msg,{icon:1,time:1000},function(){
+							location.reload(true);
+						});
+						
+						
+						
+						
+					}else{
+						layer.msg(obj.msg);
+					}
+					
+				},
+				error:function(e){
+					
+					layer.msg('加载错失败！！');
+				}
+			});
+          });
+		
+      }
+    </script>
+    <script>
+	var vm = new Vue({
+							el: '#page',
+							data: {
+								num: 0,
+								dataList: null
+							},
+							
+
+					        mounted: function () {
+					                this.getCategoryList();
+					        },
+					        methods: {
+					        	getCategoryList:function(e){
+
+					        		var vm = this;
+			                        vm.$http.get("<?php echo site_url('Json/category');?>").then(function(response) {
+			                        	 var obj = response.body;
+			                  
+											if(obj.code==1){
+												vm.num=obj.num;
+												vm.dataList=obj.data;
+											}else{
+												layer.msg(obj.msg);
+											}
+			                                vm.$nextTick(function () {
+			                                	layui.use('form', function(){
+												  var form = layui.form;
+
+												  
+												  //各种基于事件的操作，下面会有进一步介绍
+												  form.on('switch(state)', function(obj){
+													  if(obj.elem.checked){
+													  	vm.changeCategoryList(obj.value,0);
+													  }else{vm.changeCategoryList(obj.value,1);}
+												  })
+												         
+												});
+
+			                                })
+			                                
+			                                
+			                        },
+			                        function(response) {
+			                                alert('获取商家列表失败！');
+			                        });
+
+					        	},
+					        	changeCategoryList:function(id,state){
+					        		 this.$http.post("<?php echo site_url('Ajax/categoryState');?>",{id:id,state:state},{emulateJSON:true}).then( (response) => {
+
+				                 } )
+					        	}
+					        }
+						}) ;
+	/*
+		
+		$(function () {
+			$.ajax({
+                url:"<?php echo site_url('Json/category');?>",
+                type:"post",
+				success:function(str){
+					console.log(str);
+					 var obj = eval('(' + str + ')');
+					if(obj.code==1){
+						vm.num=obj.num;
+						vm.dataList=obj.data;
+						
+						
+						setTimeout("initTableDataUi()",500);//每5秒监听一次
+					}else{
+						layer.msg(obj.msg);
+					}
+					
+				},
+				error:function(e){
+					
+					layer.msg('加载错失败！！');
+				}
+			});
+			
+			
+			 
+
+		})
+		*/
+		
+		
+		function initTableDataUi(){
+			
+			tableCheck = {
+				init:function  () {
+					$(".layui-form-checkbox").click(function(event) {
+						if($(this).hasClass('layui-form-checked')){
+							$(this).removeClass('layui-form-checked');
+							if($(this).hasClass('header')){
+								$(".layui-form-checkbox").removeClass('layui-form-checked');
+							}
+						}else{
+							$(this).addClass('layui-form-checked');
+							if($(this).hasClass('header')){
+								$(".layui-form-checkbox").addClass('layui-form-checked');
+							}
+						}
+						
+					});
+				},
+				getData:function  () {
+					var obj = $(".layui-form-checked").not('.header');
+					var arr=[];
+					obj.each(function(index, el) {
+						arr.push(obj.eq(index).attr('data-id'));
+					});
+					return arr;
+				}
+			}
+			layui.use(['form'], function(){
+								form = layui.form;
+								  form.render();
+							  });
+			//开启表格多选
+			tableCheck.getData();
+			tableCheck.init();
+			
+			$("tbody.x-cate tr[fid!='0']").hide();
+			// 栏目多级显示效果
+			$('.x-show').click(function () {
+				if($(this).attr('status')=='true'){
+					$(this).html('&#xe625;'); 
+					$(this).attr('status','false');
+					cateId = $(this).parents('tr').attr('cate-id');
+					$("tbody tr[fid="+cateId+"]").show();
+			   }else{
+					cateIds = [];
+					$(this).html('&#xe623;');
+					$(this).attr('status','true');
+					cateId = $(this).parents('tr').attr('cate-id');
+					getCateId(cateId);
+					for (var i in cateIds) {
+						$("tbody tr[cate-id="+cateIds[i]+"]").hide().find('.x-show').html('&#xe623;').attr('status','true');
+					}
+			   }
+			})
+		}
+		
+		function editCategoty(t){
+			
+
+		
+			var urlPragrem= '?id='+t.getAttribute("data-id")+"&pid="+t.getAttribute("data-pid")+"&text="+t.getAttribute("data-text")+"&order="+t.getAttribute("data-order");
+			
+			x_admin_show('编辑商品分类','<?php echo site_url('Dialog/category');?>'+urlPragrem,500,400);
+			
+			
+		}
+		
+	</script>
+  </body>
+
+</html>

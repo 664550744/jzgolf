@@ -1,0 +1,114 @@
+
+  
+  <body >
+  <div id='page'>
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">商品目录</a>
+        <a>
+          <cite>商品列表</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+		<button class="layui-btn" onclick="x_admin_show('添加商品','<?php echo site_url('Dialog/goods');?>?id=0')"><i class="layui-icon"></i>增加商品</button>
+		
+      	<table id="demo" lay-filter="test"></table>
+         
+	
+		 
+    </div>
+	</div>
+    <script type="text/html" id="titleTpl">
+    	{{#  if(d.online > 0){ }}
+		    已下架
+		  {{#  } else { }}
+		    上架
+		  {{#  } }}
+	</script> 
+    <script>
+
+	layui.use('table', function(){
+		  var table = layui.table;
+		  
+		  //第一个实例
+		  table.render({
+		    elem: '#demo'
+		    
+		    ,url: '<?php echo site_url("Json/goodsList");?>' //数据接口
+		    ,page: true //开启分页
+		    ,cols: [[ //表头
+		      {field: 'id', title: 'ID', width:50,  fixed: 'left'}
+		      ,{field: 'name', title: '名称'}
+		      ,{field: 'img', title: '缩略图', width:80,templet:'<div><img src="{{ d.img}}" ></div>'}
+		      ,{field: 'online', title: '状态', width:80,templet:'#titleTpl'}
+		      ,{field: 'sort', title: '排序', width:80} 
+		      ,{field: 'addtime', title: '日期', width:120}
+		      ,{field: '', title: '操作', width: 150,templet:'<div><button class="layui-btn layui-btn layui-btn-xs"    onclick="editCategoty({{ d.id}})" ><i class="layui-icon">&#xe642;</i>编辑</button> <button class="layui-btn-danger layui-btn layui-btn-xs"   onclick="member_del({{ d.id}})" href="javascript:;" ><i class="layui-icon">&#xe640;</i>删除</button></div>'}
+		    ]]
+		  });
+		  
+		});
+
+	var vm = new Vue({
+							el: '#page',
+							data: {
+								dataList: null
+							}
+		})
+		
+		
+		
+		function editCategoty(id){
+		
+			x_admin_show('编辑商品','<?php echo site_url('Dialog/goods');?>?id='+id)
+			
+			
+		}
+		/*用户-删除*/
+      function member_del(dom){
+	  
+          layer.confirm('确认要删除吗？',function(index){
+              //发异步删除数据
+              
+			  $.ajax({
+                url:"<?php echo site_url('Ajax/goodsBrandDel');?>",
+                data:{id:dom.getAttribute("data-id")},
+                type:"post",
+				success:function(str){
+					console.log(str);
+					console.log(vm);
+					 var obj = eval('(' + str + ')');
+					 
+					if(obj.code==1){
+						layer.msg(obj.msg,{icon:1,time:1000},function(){
+							location.reload(true);
+						});
+						
+						
+						
+						
+					}else{
+						layer.msg(obj.msg);
+					}
+					
+				},
+				error:function(e){
+					
+					layer.msg('加载错失败！！');
+				}
+			});
+          });
+		
+      }
+      function reloadPage(){
+      	location.replace(location.href);
+      }
+		
+		
+	</script>
+  </body>
+
+</html>

@@ -1,0 +1,135 @@
+
+  
+  <body >
+  <div id='page'>
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">商品目录</a>
+        <a>
+          <cite>品牌</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+		<button class="layui-btn" onclick="x_admin_show('添加商品品牌','<?php echo site_url('Dialog/goods_brand');?>',500,400)"><i class="layui-icon"></i>增加</button>
+		<button class="layui-btn" onclick="x_admin_show('添加商品属性','<?php echo site_url('Welcome/fileManageer');?>')"><i class="layui-icon"></i>图片</button>
+      
+         <table lay-filter="demo11" id="test11"  class="layui-table layui-form">
+        <thead>
+          <tr>
+            
+            <th>品牌名称</th>
+            <th width="50">排序</th>
+            <th width="120">操作</th>
+        </thead>
+        <tbody  class="x-cate">
+          
+			<tr v-for=' (item,index)  in dataList'   >
+           
+            <td>
+			{{item.text}}
+            </td>
+            <td>{{item.order_value}}</td>
+           
+            <td class="td-manage">
+              <button class="layui-btn layui-btn layui-btn-xs"  v-bind:data-id="item.id"  onclick="editCategoty(this)" ><i class="layui-icon">&#xe642;</i>编辑</button>
+              
+              <button class="layui-btn-danger layui-btn layui-btn-xs" v-bind:data-id="item.id"  onclick="member_del(this)" href="javascript:;" ><i class="layui-icon">&#xe640;</i>删除</button>
+            </td>
+          </tr>
+		  
+		  
+		  
+		  
+	   </tbody>
+      </table>
+	
+		 
+    </div>
+	</div>
+    
+    <script>
+	var vm = new Vue({
+							el: '#page',
+							data: {
+								dataList: null
+							}
+						}) ;
+		
+		$(function () {
+			$.ajax({
+                url:"<?php echo site_url('Json/goods_brand');?>",
+                type:"post",
+				success:function(str){
+					
+					 var obj = eval('(' + str + ')');
+					if(obj.code==1){
+						vm.dataList=obj.data;
+					}else{
+						layer.msg(obj.msg);
+					}
+					
+				},
+				error:function(e){
+					
+					layer.msg('加载错失败！！');
+				}
+			});
+			
+			
+			 
+
+		})
+		
+		
+		
+		function editCategoty(t){
+		
+			var urlPragrem= '?id='+t.getAttribute("data-id")
+			x_admin_show('编辑商品品牌','<?php echo site_url('Dialog/goods_brand');?>'+urlPragrem,500,400)
+			
+		}
+		/*用户-删除*/
+      function member_del(dom){
+	  
+          layer.confirm('确认要删除吗？',function(index){
+              //发异步删除数据
+              
+			  $.ajax({
+                url:"<?php echo site_url('Ajax/goodsBrandDel');?>",
+                data:{id:dom.getAttribute("data-id")},
+                type:"post",
+				success:function(str){
+					console.log(str);
+					console.log(vm);
+					 var obj = eval('(' + str + ')');
+					 
+					if(obj.code==1){
+						layer.msg(obj.msg,{icon:1,time:1000},function(){
+							location.reload(true);
+						});
+						
+						
+						
+						
+					}else{
+						layer.msg(obj.msg);
+					}
+					
+				},
+				error:function(e){
+					
+					layer.msg('加载错失败！！');
+				}
+			});
+          });
+		
+      }
+		
+		
+	</script>
+  </body>
+
+</html>
