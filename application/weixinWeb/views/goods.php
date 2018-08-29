@@ -288,6 +288,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             url: '<?php echo site_url("Ajax/addcart");?>',
             data:{g_id:'<?php echo $id;?>',goods_selects_text:goods_select_text,goods_selects:JSON.stringify(checkSelect),price:parseInt(vm.price)+parseInt(vm.addPrice) },
             type:"POST",
+            dataType: "json",
             beforeSend:function(){
                 dialog.loading.open('正在添加到购物车中...');
             
@@ -300,8 +301,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     isPost =false;
                 }, 2000);
             },
-            success:function(result) {
-                console.log(result);
+            success:function(obj) {
+
+                if(obj.code==1){
+                    dialog.toast(obj.msg, 'success', 1000);
+                }else{
+                    dialog.toast(obj.msg, 'error', 1000);
+                }
+
+
             }
         });
      }
