@@ -70,4 +70,30 @@ class Ajax extends CI_Controller {
 		
 		
 	}
+
+    /**
+     * Notes: 删除购物车中的商品
+     * User: wangwenhua
+     * Date: 2018/8/30
+     * Time: 下午8:21
+     * qq: 664550744
+     * e-mail:664550744@qq.com
+     */
+    public function deleteCart()
+    {
+        $this->load->library('login');
+        $this->load->library('common');
+        $login_ok = $this->login->login_ok();
+        if (!$login_ok) {
+            $this->common->json(array('code' => 0, 'msg' => '请先登录'));
+        }
+       $id = intval($this->input->get_post("id",true));
+        $this->load->model('Cart_model');
+        $r = $this->Cart_model->delete($id);
+        if($r){
+            $this->common->json(array('code' => 1, 'msg'=>'购物车商品删除成功'));
+        }else{
+            $this->common->json(array('code' => 0, 'msg'=>'购物车商品删除失败'));
+        }
+    }
 }

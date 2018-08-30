@@ -87,6 +87,13 @@ class Welcome extends CI_Controller {
 		$this->load->view('category_goods',array('title' => $title[$cat],'cat'=>$cat ));
 		$this->load->view('footer.html',array('num'=>$num));
 	}
+
+	public function checkOrder(){
+        $this->load->view('header.html');
+        $this->load->view('checkOrder',array('title' => '确认订单' ));
+
+
+    }
 	
 	
 	

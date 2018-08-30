@@ -64,8 +64,10 @@ class Cart_model extends CI_Model {
 		return $r;
 
     }
-    public function delete($where)
+    public function delete($id)
     {
 
+        $this->db->where('id', $id);
+        return $this->db->delete('cart');
     }
 }
