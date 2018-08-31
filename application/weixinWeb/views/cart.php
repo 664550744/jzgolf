@@ -129,11 +129,43 @@
                             dialog.toast('库存不能小于1', 'none', 1000);
                             return;
                         }
-
+                        this.postCartNum(id,num,index);
 
                     },
                     numadd:function (id,num,index) {
                         num++;
+                        this.postCartNum(id,num,index);
+                    },
+                    postCartNum:function (id,num,index) {
+                        $.ajax({
+                            url: '<?php echo site_url("Ajax/numCart");?>',
+                            data:{id:id,num:num},
+                            type:"POST",
+                            dataType: "json",
+                            beforeSend:function(){
+                                dialog.loading.open('正在购物车中的商品数量...');
+
+                            },
+                            complete: function () {
+                                dialog.loading.close();/* 移除loading */
+
+
+                            },
+                            success:function(obj) {
+
+
+                                if(obj.code==1){
+                                    vm.dataList[index]["num"]=num;
+                                    //dialog.toast(obj.msg, 'success', 1000);
+
+                                }else{
+                                    dialog.toast(obj.msg, 'error', 1000);
+                                }
+
+
+                            }
+                        });
+
                     }
 
 				}

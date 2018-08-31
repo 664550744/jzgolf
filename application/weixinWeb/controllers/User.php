@@ -3,7 +3,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class User extends CI_Controller {
 
-	
+    /**
+     * Notes: 用户微信登录处理
+     * User: wangwenhua
+     * Date: 2018/8/31
+     * Time: 上午10:24
+     * qq: 664550744
+     * e-mail:664550744@qq.com
+     */
 	public function login()
 	{
 
@@ -84,6 +91,63 @@ class User extends CI_Controller {
 
 		
 	}
+
+    /**
+     * Notes: 添加收货地址
+     * User: wangwenhua
+     * Date: 2018/8/31
+     * Time: 上午10:26
+     * qq: 664550744
+     * e-mail:664550744@qq.com
+     */
+    public function addressAdd()
+    {
+        $this->load->library('login');
+        $this->login->isLogin();
+        $this->load->model('Cart_model');
+        $num = $this->Cart_model->getNum($this->session->userdata('user_id'));
+        $this->load->view('header.html');
+        $this->load->view('address_add',array('title' => "添加收货地址" ));
+        $this->load->view('footer.html',array('num'=>$num));
+    }
+
+    /**
+     * Notes: 收货地址列表
+     * User: wangwenhua
+     * Date: 2018/8/31
+     * Time: 上午10:27
+     * qq: 664550744
+     * e-mail:664550744@qq.com
+     */
+    public function addressList()
+    {
+        $this->load->library('login');
+        $this->login->isLogin();
+        $this->load->model('Cart_model');
+        $num = $this->Cart_model->getNum($this->session->userdata('user_id'));
+        $this->load->view('header.html');
+        $this->load->view('address_list',array('title' => "收货地址" ));
+        $this->load->view('footer.html',array('num'=>$num));
+    }
+
+    /**
+     * Notes: 修改收货地址
+     * User: wangwenhua
+     * Date: 2018/8/31
+     * Time: 上午10:27
+     * qq: 664550744
+     * e-mail:664550744@qq.com
+     */
+    public function addressEdit()
+    {
+        $this->load->library('login');
+        $this->login->isLogin();
+        $this->load->model('Cart_model');
+        $num = $this->Cart_model->getNum($this->session->userdata('user_id'));
+        $this->load->view('header.html');
+        $this->load->view('address_edit',array('title' => "修改收货地址" ));
+        $this->load->view('footer.html',array('num'=>$num));
+    }
 	
 	
 	

@@ -3,17 +3,19 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /**
  * Created by PhpStorm.
  * User: wangwenhua
- * Date: 2018/8/30
- * Time: 下午9:49
+ * Date: 2018/8/31
+ * Time: 上午10:37
  */
 ?>
 <header class="m-navbar">
-    <a href="<?php echo site_url('Welcome/cart');?>" class="navbar-item">
+    <a href="javascript:window.history.back()" class="navbar-item">
         <i class="back-ico"></i>
     </a>
     <div class="navbar-center"><span class="navbar-title"><?php echo $title; ?></span></div>
 </header>
+<section class="g-scrollview" id="J_List">
+
+
+
 
 </section>
-</body>
-</html>

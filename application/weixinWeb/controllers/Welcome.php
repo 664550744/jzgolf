@@ -89,8 +89,22 @@ class Welcome extends CI_Controller {
 	}
 
 	public function checkOrder(){
+        $this->load->library('login');
+        $this->login->isLogin();
+        $this->load->model('Address_model');
+        $address = $this->Address_model->getData($this->session->userdata('user_id'));
+        if(empty($address)){
+            $redirect_url = site_url(uri_string());
+            $userSess = array(
+                'redirect_url'  => $redirect_url
+            );
+
+            $this->session->set_userdata($userSess);
+            redirect(site_url('User/addressAdd'));
+        }
+
         $this->load->view('header.html');
-        $this->load->view('checkOrder',array('title' => '确认订单' ));
+        $this->load->view('checkOrder',array('title' => '确认订单','address'=>$address[0]));
 
 
     }
