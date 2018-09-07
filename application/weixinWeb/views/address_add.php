@@ -52,7 +52,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <!-- 引入YDUI脚本 -->
 <script src="<?php echo base_url();?>assets/admin/js/jquery.min.js"></script>
 <script src="<?php echo base_url();?>assets/ydui/build/js/ydui.js"></script>
-<script src="//static.ydcss.com/uploads/ydui/ydui.citys.js"></script>
+<script src="<?php echo base_url();?>assets/ydui/ydui.citys.js"></script>
 <script>
 
 

@@ -42,6 +42,14 @@ class User extends CI_Controller {
 		$json = file_get_contents($url);//获取微信用户基本信息  
 		$arr = json_decode($json,true);
 
+        $userSess = array(
+
+            'wxopenid'   => $openid
+
+        );
+
+        $this->session->set_userdata($userSess);
+
 		//登录到高球现场系统
 		//
 		$toke_golf = '8151a643031874e2e0e22041f790b7bd';

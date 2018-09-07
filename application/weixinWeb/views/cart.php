@@ -1,5 +1,14 @@
 	<style>
 		#empty-box{display: block;width: auto;margin:50px auto;}
+        .goodsTip{
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            color:#fff;
+        }
+        .list-img{position: relative;}
 	</style>
 	<header class="m-navbar">
        
@@ -17,6 +26,7 @@
     		<div  v-for=' (item,index)  in dataList' class="list-item">
                 <div class="list-img">
                     <img src="/assets/img/goods_default.jpg" v-bind:data-url="item.img">
+                    <div v-if="item.stock_num<item.num" class="goodsTip">库存不足</div>
                 </div>
                 <div class="list-mes">
                     <h3 class="list-title">{{item.name}}</h3>
@@ -26,7 +36,7 @@
                             
                         </div>
                         <div>
-							{{item.goods_selects_text}}
+                            {{item.goods_selects_text}}
                         </div>
                     </div>
                     <div class="cell-item">
@@ -35,7 +45,7 @@
         					<span class="m-spinner" >
 				                <a href="javascript:;" v-on:click="numreduce(item.id,item.num,index)" class="J_Del"></a>
 				                <input type="text" v-model="dataList[index].num"  v-bind:value="item.num" class="J_Input" placeholder=""/>
-				                <a href="javascript:;" v-on:click="numadd(item.id,item.num,index)" class="J_Add"></a>
+				                <a href="javascript:;" v-on:click="numadd(item.id,item.num,index,item.stock_num)" class="J_Add"></a>
 				            </span>
 
         				</div>
@@ -54,7 +64,7 @@
     	
         </article>
             <div style="padding-top: 10px;padding-bottom: 10px;">
-                <a href="<?php echo site_url('Welcome/checkOrder');?>"  style="margin: 0 auto;color: #fff;border-radius: 20px; width: 80%;display: block;"  class="btn btn-danger">去结算</a>
+                <a href="<?php echo site_url('Welcome/checkOrder/');?>"  style="margin: 0 auto;color: #fff;border-radius: 20px; width: 80%;display: block;"  class="btn btn-danger">去结算</a>
 
             </div>
 
@@ -132,8 +142,12 @@
                         this.postCartNum(id,num,index);
 
                     },
-                    numadd:function (id,num,index) {
+                    numadd:function (id,num,index,stock_num) {
                         num++;
+                        if(num>stock_num){
+                            dialog.toast('库存不足', 'error', 1000);
+                            return;
+                        }
                         this.postCartNum(id,num,index);
                     },
                     postCartNum:function (id,num,index) {
@@ -143,7 +157,7 @@
                             type:"POST",
                             dataType: "json",
                             beforeSend:function(){
-                                dialog.loading.open('正在购物车中的商品数量...');
+                                dialog.loading.open('正在修改购买数量...');
 
                             },
                             complete: function () {

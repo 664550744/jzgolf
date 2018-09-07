@@ -10,7 +10,7 @@ class Cart_model extends CI_Model {
     public function getData($u_id)
     {
 
-        $this->db->select("c.id,c.g_id,c.num,c.price,c.goods_selects,c.goods_selects_text,goods.name,goods.img");
+        $this->db->select("c.id,c.g_id,c.num,c.price,c.goods_selects,c.goods_selects_text,goods.name,goods.img,goods.stock_num,goods.stock_num_info");
     	$this->db->where("u_id",$u_id);
         $this->db->from('cart as c');
         $this->db->join('goods', 'goods.id = c.g_id');
@@ -20,7 +20,33 @@ class Cart_model extends CI_Model {
 		$result = array();
 		foreach ($query->result() as $row)
 		{
-			$result[] = array('id' => $row->id,'g_id' => $row->g_id,'name' => $row->name,'img' => $row->img,'num' => $row->num,'price' => $row->price,'goods_selects' => $row->goods_selects,'goods_selects_text' => $row->goods_selects_text ); 
+		    $stock_num_info = json_decode($row->stock_num_info,1);
+            $goods_selects = json_decode($row->goods_selects,1);
+
+            for($i=0;$i<count($stock_num_info);$i++){
+                switch (count($goods_selects))
+                {
+                    case 1:
+                       if($goods_selects[0]==$stock_num_info[$i]["k"][0]) {
+                           $row->stock_num = $stock_num_info[$i]["v"];
+                       }
+                        break;
+                    case 2:
+                        if($goods_selects[0]==$stock_num_info[$i]["k"][0]&&$goods_selects[1]==$stock_num_info[$i]["k"][1]) {
+                            $row->stock_num = $stock_num_info[$i]["v"];
+                        }
+                        break;
+                    case 3:
+                        if($goods_selects[0]==$stock_num_info[$i]["k"][0]&&$goods_selects[1]==$stock_num_info[$i]["k"][1]&&$goods_selects[2]==$stock_num_info[$i]["k"][2]) {
+                            $row->stock_num = $stock_num_info[$i]["v"];
+                        }
+                        break;
+
+                }
+
+            }
+
+			$result[] = array('id' => $row->id,'g_id' => $row->g_id,'name' => $row->name,'img' => $row->img,'num' => $row->num,'price' => $row->price,'goods_selects' => $row->goods_selects,'goods_selects_text' => $row->goods_selects_text ,'stock_num' => $row->stock_num );
 		    
 		}
 		return $result;
@@ -69,5 +95,50 @@ class Cart_model extends CI_Model {
 
         $this->db->where('id', $id);
         return $this->db->delete('cart');
+    }
+    public function getGoods($u_id)
+    {
+
+
+        $this->db->select("c.id,c.g_id,c.num,c.price,c.goods_selects,c.goods_selects_text,goods.name,goods.img,goods.stock_num,goods.b_uid as b_id,goods.stock_num_info");
+        $this->db->where("u_id",$u_id);
+        $this->db->from('cart as c');
+        $this->db->join('goods', 'goods.id = c.g_id');
+        $this->db->order_by("goods.b_uid", "desc");
+
+        $query = $this->db->get();
+
+        $result = array();
+        foreach ($query->result() as $row)
+        {
+            $stock_num_info = json_decode($row->stock_num_info,1);
+            $goods_selects = json_decode($row->goods_selects,1);
+
+            for($i=0;$i<count($stock_num_info);$i++){
+                switch (count($goods_selects))
+                {
+                    case 1:
+                        if($goods_selects[0]==$stock_num_info[$i]["k"][0]) {
+                            $row->stock_num = $stock_num_info[$i]["v"];
+                        }
+                        break;
+                    case 2:
+                        if($goods_selects[0]==$stock_num_info[$i]["k"][0]&&$goods_selects[1]==$stock_num_info[$i]["k"][1]) {
+                            $row->stock_num = $stock_num_info[$i]["v"];
+                        }
+                        break;
+                    case 3:
+                        if($goods_selects[0]==$stock_num_info[$i]["k"][0]&&$goods_selects[1]==$stock_num_info[$i]["k"][1]&&$goods_selects[2]==$stock_num_info[$i]["k"][2]) {
+                            $row->stock_num = $stock_num_info[$i]["v"];
+                        }
+                        break;
+
+                }
+
+            }
+            $result[] = array('g_id' => $row->g_id,'b_id' => $row->b_id,'num' => $row->num,'price' => $row->price,'goods_selects' => $row->goods_selects,'goods_selects_text' => $row->goods_selects_text,'stock_num' => $row->stock_num,'stock_num_info'=> $row->stock_num_info);
+
+        }
+        return $result;
     }
 }
